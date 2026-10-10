@@ -182,14 +182,39 @@ Reconfigure keeps password, sessions and plugins
     Configure current module
     Read admin credentials
     Should Be Equal    ${maubot_password}    ${before_password}
+    # Unchanged settings do not restart maubot; restart it to check that the
+    # kept token secret lets a session survive a restart
+    ${rc} =    Execute Command    runagent -m ${module_id} systemctl --user restart maubot.service
+    ...    return_rc=True    return_stdout=False
+    Should Be Equal As Integers    ${rc}    0
     Wait until maubot is up
-    # The token secret is kept, so a session survives the restart
     Set Suite Variable    ${token}    ${before_token}
     ${plugins} =    Plugin list
     Should Contain    ${plugins}    "${PLUGIN_ID}"
     # A request without homeservers keeps them (clone, restore)
     &{config} =    Get configuration
     Length Should Be    ${config.homeservers}    1
+
+maubot runs from the patched runtime image
+    ${image} =    Execute Command    runagent -m ${module_id} printenv MAUBOT_RUNTIME_IMAGE
+    ${image} =    Strip String    ${image}
+    Should Match Regexp    ${image}    ^ghcr\\.io/platypuschan/maubot-runtime:[0-9a-f]{12}$
+    ${running} =    Execute Command    runagent -m ${module_id} podman inspect --format {{.ImageName}} maubot
+    Should Be Equal    ${running}    ${image}
+    # Libraries added for plugins
+    ${output}    ${rc} =    Execute Command    runagent -m ${module_id} podman exec maubot python3 -c 'import matplotlib, numpy, bs4, emoji, apscheduler, cron_descriptor, pillow_heif'
+    ...    return_rc=True    return_stderr=True    return_stdout=False
+    Should Be Equal As Integers    ${rc}    0    plugin libraries missing: ${output}
+
+Saving unchanged settings keeps maubot running
+    ${before} =    Execute Command    runagent -m ${module_id} podman inspect --format {{.Id}} maubot
+    Configure current module
+    ${after} =    Execute Command    runagent -m ${module_id} podman inspect --format {{.Id}} maubot
+    Should Be Equal    ${after}    ${before}    maubot was restarted although nothing changed
+    ${rc} =    Execute Command    runagent -m ${module_id} test ! -e maubot-restart-needed
+    ...    return_rc=True    return_stdout=False
+    Should Be Equal As Integers    ${rc}    0
+    Wait until maubot is up
 
 Invalid homeservers are rejected
     ${output}    ${rc} =    Run action    configure-module    {"host": "${HOST}", "http2https": false, "lets_encrypt": false, "homeservers": [{"name": "example.org", "url": "matrix.example.org"}]}

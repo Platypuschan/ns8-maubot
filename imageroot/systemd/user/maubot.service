@@ -33,7 +33,7 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/maubot.pid \
     --volume maubot-data:/data:z \
     --volume %E/state/config:/etc/maubot:ro,Z \
     --entrypoint /bin/sh \
-    ${MAUBOT_IMAGE} \
+    ${MAUBOT_RUNTIME_IMAGE} \
     -c "mkdir -p /data/plugins /data/trash /data/dbs && exec python3 -m maubot -c /etc/maubot/maubot.yaml --no-update"
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/maubot.ctr-id -t 30
 SyslogIdentifier=%u

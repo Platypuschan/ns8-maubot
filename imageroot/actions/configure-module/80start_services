@@ -12,5 +12,12 @@ exec 1>&2
 systemctl --user enable maubot.service
 # A previous failed start can have hit the start rate limit; clear it first.
 systemctl --user reset-failed maubot.service
-# maubot reads its configuration only at start, so apply changes with a restart.
-systemctl --user restart maubot.service
+# maubot reads its configuration only at start. Restart it only when
+# 10configure_maubot changed the configuration (also in an earlier, failed
+# run), so saving unchanged settings does not interrupt the bots.
+if ! systemctl --user is-active --quiet maubot.service; then
+    systemctl --user start maubot.service
+elif [[ -e maubot-restart-needed ]]; then
+    systemctl --user restart maubot.service
+fi
+rm -f maubot-restart-needed
