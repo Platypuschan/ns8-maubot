@@ -1,0 +1,45 @@
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+#
+# maubot, a plugin-based Matrix bot system.
+# Most parts of this file come from podman-generate-systemd.
+#
+# The image entrypoint (docker/run.sh) copies an example configuration and
+# rewrites config.yaml on every start. The module renders the complete
+# configuration itself (pypkg/maubot_setup.py), mounts it read-only and runs
+# maubot with --no-update, so the entrypoint is replaced by the few
+# directories it would create. maubot runs as root of the rootless
+# container, i.e. as the module user, so its files stay readable by the
+# module agent. The data volume uses the shared SELinux label (:z) because
+# module-dump-state mounts it from a second container during backups.
+#
+
+[Unit]
+Description=maubot Matrix bot system
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%E/state/environment
+WorkingDirectory=%E/state
+Restart=always
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/maubot.pid %t/maubot.ctr-id
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/maubot.pid \
+    --cidfile %t/maubot.ctr-id --cgroups=no-conmon \
+    --replace -d --name maubot \
+    --publish 127.0.0.1:${TCP_PORT}:29316 \
+    --volume maubot-data:/data:z \
+    --volume %E/state/config:/etc/maubot:ro,Z \
+    --entrypoint /bin/sh \
+    ${MAUBOT_IMAGE} \
+    -c "mkdir -p /data/plugins /data/trash /data/dbs && exec python3 -m maubot -c /etc/maubot/maubot.yaml --no-update"
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/maubot.ctr-id -t 30
+SyslogIdentifier=%u
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/maubot.ctr-id
+PIDFile=%t/maubot.pid
+Type=forking
+
+[Install]
+WantedBy=default.target

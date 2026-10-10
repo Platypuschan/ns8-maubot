@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+# Render the maubot configuration of the new release, load the new unit
+# files and restart maubot if it is running.
+
+import os
+import subprocess
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "pypkg"))
+import maubot_setup
+
+state_dir = os.environ.get("AGENT_STATE_DIR", ".")
+host = os.environ.get("TRAEFIK_HOST", "")
+if host:
+    with maubot_setup.settings_lock(state_dir):
+        maubot_setup.write_config(maubot_setup.ensure_settings(state_dir), host, state_dir)
+
+subprocess.run(["systemctl", "--user", "daemon-reload"], check=True)
+subprocess.run(["systemctl", "--user", "try-restart", "maubot.service"], check=True)

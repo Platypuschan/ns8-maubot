@@ -1,0 +1,88 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Configure maubot",
+    "$id": "http://nethserver.org/json-schema/task/input/maubot/configure-module",
+    "description": "Configure the maubot Matrix bot system",
+    "examples": [
+        {
+            "host": "maubot.domain.org",
+            "http2https": true,
+            "lets_encrypt": true
+        },
+        {
+            "host": "maubot.domain.org",
+            "http2https": true,
+            "lets_encrypt": true,
+            "admin_password": "a new password",
+            "homeservers": [
+                {
+                    "name": "domain.org",
+                    "url": "https://matrix.domain.org",
+                    "secret": ""
+                }
+            ]
+        }
+    ],
+    "type": "object",
+    "required": [
+        "host",
+        "http2https",
+        "lets_encrypt"
+    ],
+    "properties": {
+        "host": {
+            "type": "string",
+            "description": "Host name for the maubot management UI and plugin web endpoints, like 'maubot.domain.org'",
+            "format": "hostname",
+            "pattern": "\\."
+        },
+        "lets_encrypt": {
+            "type": "boolean",
+            "title": "Let's Encrypt certificate",
+            "description": "Request a valid Let's Encrypt certificate."
+        },
+        "http2https": {
+            "type": "boolean",
+            "title": "HTTP to HTTPS redirection",
+            "description": "Redirect all the HTTP requests to HTTPS"
+        },
+        "admin_password": {
+            "type": "string",
+            "title": "Admin password",
+            "description": "New password of the maubot user 'admin'; omitted or empty keeps the current one (generated on the first configuration)",
+            "maxLength": 256
+        },
+        "homeservers": {
+            "type": "array",
+            "title": "Homeservers",
+            "description": "Matrix homeservers the management UI can log bot accounts in to. Omitted keeps the current list.",
+            "maxItems": 50,
+            "items": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "url"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Matrix server name, the part after ':' in user IDs",
+                        "minLength": 1,
+                        "maxLength": 255
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": "Client-server API URL of the homeserver",
+                        "minLength": 1,
+                        "maxLength": 2048
+                    },
+                    "secret": {
+                        "type": "string",
+                        "description": "Optional registration shared secret, to register new bot accounts from the UI",
+                        "maxLength": 1024
+                    }
+                }
+            }
+        }
+    }
+}

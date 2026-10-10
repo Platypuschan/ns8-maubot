@@ -1,0 +1,8 @@
+# Minimal maubot plugin that the QEMU tests upload; it does nothing.
+maubot: 0.1.0
+id: io.github.platypuschan.nsci
+version: 1.0.0
+license: MIT
+modules:
+- nsci
+main_class: CiBot

@@ -1,0 +1,85 @@
+{
+  "error": {
+    "403": "Operation nicht zugelassen",
+    "cannot_retrieve_installed_modules": "installierte Module nicht abrufbar",
+    "401": "fehlerhafte Anmeldung",
+    "cannot_retrieve_module_info": "Modulinfo nicht abrufbar",
+    "generic_error": "Etwas ist schief gegangen",
+    "error": "Fehler",
+    "network_timeout": "Netzwerk Timeout",
+    "404": "Ressource nicht gefunden",
+    "network_error": "Netzwerkfehler",
+    "validation_error": "Fehlerhafte Prüfung"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "configure_instance": "{instance} konfigurieren",
+    "save": "Speichern",
+    "lets_encrypt": "LE-Zertifikat anfordern",
+    "http_to_https": "HTTPS erzwingen",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "configuring": "Wird konfiguriert",
+    "instance_configuration": "maubot konfigurieren",
+    "domain_already_used_in_traefik": "Domain wird in Traefik bereits verwendet",
+    "host_pattern": "Muss ein gültiger vollqualifizierter Domainname sein",
+    "host_format": "Muss ein gültiger vollqualifizierter Domainname sein",
+    "maubot_fqdn": "maubot-Hostname (FQDN)",
+    "management_title": "maubot-Verwaltungsoberfläche",
+    "management_description": "In der maubot-Verwaltungsoberfläche werden Plugins hochgeladen, Bot-Konten (Clients) hinzugefügt und Plugin-Instanzen angelegt. Anmeldung mit dem Benutzer und Passwort unten.",
+    "management_url": "Verwaltungsoberfläche",
+    "admin_user": "Benutzername",
+    "admin_password": "Passwort",
+    "open_management": "Verwaltungsoberfläche öffnen",
+    "homeservers_title": "Homeserver",
+    "homeservers_description": "Matrix-Homeserver, bei denen sich Bot-Konten aus der Verwaltungsoberfläche mit Passwort anmelden können. Bots auf anderen Homeservern lassen sich weiterhin mit einem Access-Token hinzufügen. Mit dem Registration Shared Secret eines Synapse-Homeservers können neue Bot-Konten direkt in der Oberfläche registriert werden.",
+    "homeserver_name": "Servername",
+    "homeserver_url": "Homeserver-URL",
+    "homeserver_secret": "Registration Shared Secret (optional)",
+    "add_homeserver": "Homeserver hinzufügen",
+    "remove_homeserver": "Entfernen",
+    "invalid_server_name": "Muss ein Matrix-Servername sein, z. B. example.org oder example.org:8448",
+    "duplicate_server_name": "Dieser Servername ist bereits in der Liste",
+    "invalid_homeserver_url": "Muss eine http://- oder https://-URL sein, z. B. https://matrix.example.org",
+    "new_admin_password": "Neues Admin-Passwort",
+    "new_admin_password_helper": "Leer lassen, um das aktuelle Passwort zu behalten.",
+    "admin_password_maxLength": "Darf höchstens 256 Zeichen lang sein"
+  },
+  "common": {
+    "required": "erforderlich",
+    "work_in_progress": "In Arbeit",
+    "processing": "Ausführung..."
+  },
+  "status": {
+    "created": "erstellt",
+    "size": "Größe",
+    "name": "Name",
+    "no_images": "Keine Abbilder",
+    "app_volumes": "App Volumen | App Volumen",
+    "services": "Dienst | Dienste",
+    "app_images": "App-Abbild | App-Abbilder",
+    "no_services": "Keine Dienste",
+    "app_instance": "App-Instanz",
+    "mount": "Einbindepunkt",
+    "title": "Status",
+    "installation_node": "Knoten der Installation",
+    "node": "Knoten",
+    "no_volumes": "keine Volumen"
+  },
+  "about": {
+    "title": "Über"
+  },
+  "action": {
+    "list-backup-repositories": "Liste der Datensicherungs-Speicherort",
+    "get-module-info": "Informationen zum Modul abrufen",
+    "list-installed-modules": "installierte Module auflisten",
+    "list-backups": "Datensicherungen auflisten",
+    "get-status": "Status abfragen",
+    "configure-module": "Modul konfigurieren",
+    "get-configuration": "Konfiguration abrufen",
+    "get-name": "Name abrufen"
+  },
+  "task": {
+    "cannot_create_task": "{task} kann nicht erstellt werden"
+  }
+}

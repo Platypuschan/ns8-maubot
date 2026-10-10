@@ -1,0 +1,77 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Get maubot settings",
+    "$id": "http://nethserver.org/json-schema/task/output/maubot/get-configuration",
+    "description": "Get the maubot settings and the admin login for the management UI",
+    "examples": [
+        {
+            "host": "maubot.domain.org",
+            "http2https": true,
+            "lets_encrypt": true,
+            "url": "https://maubot.domain.org/_matrix/maubot/",
+            "admin_user": "admin",
+            "admin_password": "secret",
+            "homeservers": [
+                {
+                    "name": "domain.org",
+                    "url": "https://matrix.domain.org",
+                    "secret": ""
+                }
+            ]
+        }
+    ],
+    "type": "object",
+    "required": [
+        "host",
+        "http2https",
+        "lets_encrypt",
+        "url",
+        "admin_user",
+        "admin_password",
+        "homeservers"
+    ],
+    "properties": {
+        "host": {
+            "type": "string"
+        },
+        "lets_encrypt": {
+            "type": "boolean"
+        },
+        "http2https": {
+            "type": "boolean"
+        },
+        "url": {
+            "type": "string",
+            "description": "Management UI URL; empty before the first configuration"
+        },
+        "admin_user": {
+            "type": "string"
+        },
+        "admin_password": {
+            "type": "string",
+            "description": "Empty before the first configuration"
+        },
+        "homeservers": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "url",
+                    "secret"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    },
+                    "secret": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}
