@@ -7,7 +7,8 @@ UI.
 The module runs maubot `v0.6.0` as a rootless container from
 `ghcr.io/platypuschan/maubot-runtime`: the official image
 (`dock.mau.dev/maubot/maubot`, pinned by digest) with current Alpine and
-Python security fixes, see [Runtime image](#runtime-image). It adds:
+Python security fixes and extra libraries for plugins, see
+[Runtime image](#runtime-image). It adds:
 
 - a Traefik route for the management UI, its API and the plugin web
   endpoints, with optional Let's Encrypt certificate;
@@ -108,6 +109,20 @@ TLS to homeservers and plugins that fetch feeds, web pages or images.
 [`runtime/Containerfile`](runtime/Containerfile) therefore installs the patch
 releases on top of the pinned official image (`apk upgrade`, urllib3,
 requests, pytest); maubot itself is unchanged.
+
+maubot cannot install the Python dependencies of plugins. Besides the
+libraries of the upstream image (Pillow, feedparser, lxml, dateparser,
+python-gitlab, pyquery, ...), the runtime image adds the ones that plugins of
+the [plugin index](https://plugins.mau.bot/) declare and the upstream image
+lacks:
+
+| Library | For |
+| --- | --- |
+| matplotlib, numpy | the official `tex` plugin (LaTeX formulas) |
+| beautifulsoup4 | plugins that scrape web pages |
+| emoji | the ntfy plugin |
+| apscheduler, cron-descriptor | reminder plugins with cron schedules |
+| pillow-heif | HEIC/HEIF images (pip wheel with its own libheif) |
 
 The image tag is the Git tree hash of `runtime/`
 ([`.github/scripts/runtime-image`](.github/scripts/runtime-image)). The

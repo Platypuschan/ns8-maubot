@@ -201,6 +201,10 @@ maubot runs from the patched runtime image
     Should Match Regexp    ${image}    ^ghcr\\.io/platypuschan/maubot-runtime:[0-9a-f]{12}$
     ${running} =    Execute Command    runagent -m ${module_id} podman inspect --format {{.ImageName}} maubot
     Should Be Equal    ${running}    ${image}
+    # Libraries added for plugins
+    ${output}    ${rc} =    Execute Command    runagent -m ${module_id} podman exec maubot python3 -c 'import matplotlib, numpy, bs4, emoji, apscheduler, cron_descriptor, pillow_heif'
+    ...    return_rc=True    return_stderr=True    return_stdout=False
+    Should Be Equal As Integers    ${rc}    0    plugin libraries missing: ${output}
 
 Saving unchanged settings keeps maubot running
     ${before} =    Execute Command    runagent -m ${module_id} podman inspect --format {{.Id}} maubot
