@@ -5,7 +5,8 @@
 #
 
 # Render the maubot configuration of the new release, load the new unit
-# files and restart maubot if it is running.
+# files and restart maubot if it is running (the runtime image may have
+# changed, too).
 
 import os
 import subprocess
@@ -22,3 +23,9 @@ if host:
 
 subprocess.run(["systemctl", "--user", "daemon-reload"], check=True)
 subprocess.run(["systemctl", "--user", "try-restart", "maubot.service"], check=True)
+# A running maubot now has the new configuration; a stopped one reads it
+# when it starts.
+try:
+    os.remove(os.path.join(state_dir, maubot_setup.RESTART_FLAG))
+except FileNotFoundError:
+    pass

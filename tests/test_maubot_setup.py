@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import unittest.mock
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -163,6 +164,18 @@ class ConfigTest(unittest.TestCase):
         self.assertFalse(maubot_setup.write_config(self.settings, "bot.example.org", self.state))
         self.assertTrue(maubot_setup.write_config(self.settings, "new.example.org", self.state))
 
+    def test_changed_config_sets_the_restart_flag(self):
+        flag = os.path.join(self.state, maubot_setup.RESTART_FLAG)
+        maubot_setup.write_config(self.settings, "bot.example.org", self.state)
+        self.assertTrue(os.path.exists(flag))
+        os.remove(flag)
+        # Unchanged: no restart needed
+        maubot_setup.write_config(self.settings, "bot.example.org", self.state)
+        self.assertFalse(os.path.exists(flag))
+        self.settings["admin_password"] = "changed"
+        maubot_setup.write_config(self.settings, "bot.example.org", self.state)
+        self.assertTrue(os.path.exists(flag))
+
     def test_get_configuration_output(self):
         output = maubot_setup.configuration(self.settings, "bot.example.org", True, False)
         self.assertEqual(output["url"], "https://bot.example.org/_matrix/maubot/")
@@ -255,6 +268,13 @@ class BackupTest(unittest.TestCase):
         self.run_script(maubot_backup.CLEANUP_SCRIPT)
         self.assertFalse((self.data / maubot_backup.SNAPSHOT).exists())
 
+    def test_podman_command_uses_the_runtime_image(self):
+        calls = []
+        environment = dict(os.environ, MAUBOT_RUNTIME_IMAGE="ghcr.io/x/maubot-runtime:abc")
+        with unittest.mock.patch.dict(os.environ, environment, clear=True):
+            maubot_backup.cleanup_snapshot(runner=lambda args, check: calls.append(args))
+        self.assertIn("ghcr.io/x/maubot-runtime:abc", calls[0])
+
     def test_podman_command(self):
         calls = []
         maubot_backup.make_snapshot(image="img:tag", runner=lambda args, check: calls.append(args))
@@ -268,10 +288,24 @@ class BackupTest(unittest.TestCase):
 class UnitFileTest(unittest.TestCase):
     def test_service_uses_rendered_config(self):
         unit = (ROOT / "imageroot" / "systemd" / "user" / "maubot.service").read_text(encoding="utf-8")
+        # NS8 names the variable after the image in org.nethserver.images
+        self.assertIn("${MAUBOT_RUNTIME_IMAGE}", unit)
         self.assertIn("--volume %E/state/config:/etc/maubot:ro,Z", unit)
         self.assertIn("--volume maubot-data:/data:z", unit)
         self.assertIn(f"127.0.0.1:${{TCP_PORT}}:{maubot_setup.CONTAINER_PORT}", unit)
         self.assertIn("-c /etc/maubot/" + os.path.basename(maubot_setup.CONFIG) + " --no-update", unit)
+
+
+
+class RuntimeImageTest(unittest.TestCase):
+    def test_upstream_image_is_pinned_by_digest(self):
+        containerfile = (ROOT / "runtime" / "Containerfile").read_text(encoding="utf-8")
+        self.assertRegex(containerfile, r"(?m)^FROM dock\.mau\.dev/maubot/maubot:v[0-9.]+@sha256:[0-9a-f]{64}$")
+
+    def test_build_references_the_runtime_image(self):
+        build = (ROOT / "build-images.sh").read_text(encoding="utf-8")
+        self.assertIn('--label="org.nethserver.images=${maubot_image}"', build)
+        self.assertIn("maubot-runtime:", (ROOT / ".github" / "scripts" / "runtime-image").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

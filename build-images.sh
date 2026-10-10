@@ -16,9 +16,16 @@ repobase="${REPOBASE:-ghcr.io/platypuschan}"
 # "maubot" from the repository name "ns8-maubot".
 reponame="maubot"
 repository_source="${GITHUB_SERVER_URL:-https://github.com}/${GITHUB_REPOSITORY:-Platypuschan/ns8-maubot}"
-# maubot release image, built by the maubot project (docker/run.sh is not used,
-# see imageroot/systemd/user/maubot.service).
-MAUBOT_TAG="v0.6.0"
+# maubot runs from runtime/: the official maubot release image plus current
+# Alpine and Python security fixes (docker/run.sh is not used, see
+# imageroot/systemd/user/maubot.service). Its tag is derived from the content
+# of runtime/; in CI the "runtime" job of publish-images.yml pushes it before
+# this script runs. NS8 passes it to the module as MAUBOT_RUNTIME_IMAGE.
+maubot_image="$(.github/scripts/runtime-image)"
+if [[ -z "${CI:-}" ]] && ! buildah inspect --type image "${maubot_image}" >/dev/null 2>&1; then
+	echo "Building the maubot runtime image ${maubot_image}..."
+	buildah bud --layers -t "${maubot_image}" runtime
+fi
 # Keep in sync with the Node.js version used by .github/workflows/validate.yml
 NODE_IMAGE="docker.io/library/node:24.20.0"
 nodebuilder="nodebuilder-maubot-${NODE_IMAGE##*:}"
@@ -48,7 +55,7 @@ buildah config --entrypoint=/ \
 	--label="org.nethserver.authorizations=traefik@node:routeadm" \
 	--label="org.nethserver.tcp-ports-demand=1" \
 	--label="org.nethserver.rootfull=0" \
-	--label="org.nethserver.images=dock.mau.dev/maubot/maubot:${MAUBOT_TAG}" \
+	--label="org.nethserver.images=${maubot_image}" \
 	"${container}"
 # Commit the image
 buildah commit "${container}" "${repobase}/${reponame}"

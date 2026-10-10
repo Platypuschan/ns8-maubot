@@ -94,7 +94,7 @@ shutil.rmtree(os.path.join(data, ".backup-snapshot.tmp"), ignore_errors=True)
 
 def run_in_volume(script, image=None, runner=subprocess.run):
     """Run a Python script in a throw-away maubot container on the volume."""
-    image = image or os.environ["MAUBOT_IMAGE"]
+    image = image or os.environ["MAUBOT_RUNTIME_IMAGE"]
     runner(
         (
             "podman", "run", "--rm", "--network=none",

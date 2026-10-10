@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# maubot runtime image: the official maubot release image with current
+# Alpine and Python security fixes.
+#
+# The maubot project rebuilds dock.mau.dev/maubot/maubot only for a new
+# release, so the Alpine 3.22 packages (OpenSSL, Python, expat, image
+# libraries for Pillow, ...) and the pip-installed HTTP libraries age between
+# releases. maubot uses them at runtime: TLS to homeservers, and plugins that
+# fetch and parse feeds, web pages or images.
+#
+# Any change in this directory produces a new image tag, see build-images.sh;
+# change REFRESHED to pick up later fixes without other changes.
+
+FROM dock.mau.dev/maubot/maubot:v0.6.0@sha256:6968ddea1e08aa7f8ac70ac7a706663fe8d7b4d6f96cd7a6bb8548637fb8cd17
+
+ARG REFRESHED=2026-10-10
+
+# Links the GHCR package to the (public) module repository.
+LABEL org.opencontainers.image.source="https://github.com/Platypuschan/ns8-maubot"
+
+# Same minor versions as upstream (Alpine 3.22, Python 3.12); only patch
+# releases are installed. pytest stays because maubot's plugin test helpers
+# (pytest-asyncio) depend on it.
+RUN set -eux; \
+    apk upgrade --no-cache; \
+    pip3 install --no-cache-dir --break-system-packages --upgrade \
+        "urllib3>=2.8.0,<3" \
+        "requests>=2.33.0,<3" \
+        "pytest>=9.0.3,<10"; \
+    python3 -c "import maubot, mautrix, aiohttp, PIL, olm, ssl; print(ssl.OPENSSL_VERSION)"

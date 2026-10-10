@@ -24,6 +24,10 @@ import secrets
 SETTINGS = "maubot.json"
 CONFIG_DIR = "config"
 CONFIG = os.path.join(CONFIG_DIR, "maubot.yaml")
+# Set when the configuration changed and maubot has not been restarted with
+# it yet; configure-module (80start_services) and update-module.d clear it.
+# It stays across a failed task, so the next run still restarts maubot.
+RESTART_FLAG = "maubot-restart-needed"
 
 ADMIN_USER = "admin"
 # maubot listens on this port inside the container; Podman publishes it on
@@ -218,7 +222,11 @@ def build_config(settings, host):
 
 
 def write_config(settings, host, state_dir="."):
-    """Render the maubot configuration; return True if it changed."""
+    """Render the maubot configuration; return True if it changed.
+
+    A change also sets RESTART_FLAG, because maubot reads the file only at
+    start.
+    """
     directory = os.path.join(state_dir, CONFIG_DIR)
     os.makedirs(directory, mode=0o700, exist_ok=True)
     os.chmod(directory, 0o700)
@@ -237,6 +245,8 @@ def write_config(settings, host, state_dir="."):
         stream.write(content)
     os.chmod(temporary, 0o600)
     os.replace(temporary, path)
+    with open(os.path.join(state_dir, RESTART_FLAG), "w", encoding="utf-8"):
+        pass
     return True
 
 

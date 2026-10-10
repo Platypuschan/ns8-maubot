@@ -4,8 +4,10 @@ NethServer 8 module for [maubot](https://github.com/maubot/maubot), a
 plugin-based [Matrix](https://matrix.org/) bot system with a web management
 UI.
 
-The module runs the official maubot image (`dock.mau.dev/maubot/maubot`,
-currently `v0.6.0`) as a rootless container and adds:
+The module runs maubot `v0.6.0` as a rootless container from
+`ghcr.io/platypuschan/maubot-runtime`: the official image
+(`dock.mau.dev/maubot/maubot`, pinned by digest) with current Alpine and
+Python security fixes, see [Runtime image](#runtime-image). It adds:
 
 - a Traefik route for the management UI, its API and the plugin web
   endpoints, with optional Let's Encrypt certificate;
@@ -55,8 +57,9 @@ Optional fields of `configure-module` (omitted fields keep their value):
 api-cli run module/maubot1/configure-module --data '{"host": "maubot.example.org", "http2https": true, "lets_encrypt": true, "homeservers": [{"name": "example.org", "url": "https://matrix.example.org", "secret": ""}]}'
 ```
 
-Every `configure-module` restarts maubot, because maubot reads its
-configuration only at start.
+maubot reads its configuration only at start, so `configure-module` restarts
+it when the maubot configuration changed (host, homeservers, admin password).
+Saving unchanged settings leaves the bots running.
 
 ## Use
 
@@ -95,6 +98,24 @@ Files:
 | `state/maubot.json` (0600) | module settings and secrets |
 | `state/config/maubot.yaml` (0600) | generated maubot configuration |
 | volume `maubot-data` | `maubot.db`, `dbs/` (plugin instance databases), `plugins/` (uploaded `.mbp` files), `trash/` |
+
+## Runtime image
+
+The maubot project rebuilds its image only for a new maubot release, so its
+Alpine packages (OpenSSL, Python, expat, the image libraries used by Pillow)
+and pip-installed HTTP libraries age in between. maubot uses them at runtime:
+TLS to homeservers and plugins that fetch feeds, web pages or images.
+[`runtime/Containerfile`](runtime/Containerfile) therefore installs the patch
+releases on top of the pinned official image (`apk upgrade`, urllib3,
+requests, pytest); maubot itself is unchanged.
+
+The image tag is the Git tree hash of `runtime/`
+([`.github/scripts/runtime-image`](.github/scripts/runtime-image)). The
+`runtime` job of `Publish images` builds and pushes each tag once, and the
+module image references it in `org.nethserver.images` (NS8 passes it as
+`MAUBOT_RUNTIME_IMAGE`). To pick up newer fixes, change `REFRESHED` in the
+Containerfile and raise `CATALOG_VERSION`; a new maubot release means a new
+`FROM` line.
 
 ## Backup and restore
 
@@ -137,7 +158,7 @@ hand:
 ## Release
 
 `CATALOG_VERSION` is the version published to the module catalog. Raise it
-in every change that alters the module image (`imageroot`, `ui`,
+in every change that alters the module image (`imageroot`, `ui`, `runtime`,
 `build-images.sh`); the Validate workflow checks this. After a merge to
 `main`, `Publish images` builds and tests the image, and
 `Publish tested catalog version` tags the tested image with that version.

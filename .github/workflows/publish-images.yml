@@ -15,7 +15,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  runtime:
+    name: "maubot runtime image"
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Build and push the runtime image once per runtime/ content
+        shell: bash
+        env:
+          REPOBASE: ghcr.io/${{ github.repository_owner }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          image="$(.github/scripts/runtime-image)"
+          if skopeo inspect --raw "docker://${image}" >/dev/null 2>&1; then
+            echo "::notice::${image} already exists; runtime/ is unchanged."
+            exit 0
+          fi
+          # Tags are never overwritten: a new runtime/ content gets a new tag.
+          buildah bud -t "${image}" runtime
+          printf '%s' "$REGISTRY_TOKEN" | buildah login --username "$GITHUB_ACTOR" --password-stdin ghcr.io
+          buildah push "${image}" "docker://${image}"
+          echo "Published ${image}" >> "$GITHUB_STEP_SUMMARY"
+
   publish-images:
+    needs: runtime
     uses: NethServer/ns8-github-actions/.github/workflows/publish-branch.yml@v1
 
   module:
