@@ -12,7 +12,9 @@ ${HOST}              maubot.test
 ${PLUGIN_ID}         io.github.platypuschan.nsci
 ${module_id}         ${EMPTY}
 ${web_port}          ${EMPTY}
-${admin_password}    ${EMPTY}
+# Not ${admin_password}: Robot variable names ignore case, which would
+# overwrite ${ADMIN_PASSWORD} of the cluster-admin login below.
+${maubot_password}    ${EMPTY}
 ${token}             ${EMPTY}
 ${ADMIN_USER}        admin
 ${ADMIN_PASSWORD}    Nethesis,1234
@@ -44,7 +46,7 @@ Read admin credentials
     Should Be Equal    ${config.url}    https://${HOST}/_matrix/maubot/
     Should Be Equal    ${config.admin_user}    admin
     Should Not Be Empty    ${config.admin_password}
-    Set Suite Variable    ${admin_password}    ${config.admin_password}
+    Set Suite Variable    ${maubot_password}    ${config.admin_password}
 
 Run action
     [Arguments]    ${action}    ${payload}
@@ -75,7 +77,7 @@ Login to maubot
     RETURN    ${body}    ${status}
 
 maubot accepts the admin login
-    ${body}    ${status} =    Login to maubot    ${admin_password}
+    ${body}    ${status} =    Login to maubot    ${maubot_password}
     Should Be Equal    ${status}    200    login failed: ${body}
     &{login} =    Evaluate    json.loads(r'''${body}''')    modules=json
     Set Suite Variable    ${token}    ${login.token}
@@ -176,10 +178,10 @@ Homeservers are written to the maubot configuration
 
 Reconfigure keeps password, sessions and plugins
     ${before_token} =    Set Variable    ${token}
-    ${before_password} =    Set Variable    ${admin_password}
+    ${before_password} =    Set Variable    ${maubot_password}
     Configure current module
     Read admin credentials
-    Should Be Equal    ${admin_password}    ${before_password}
+    Should Be Equal    ${maubot_password}    ${before_password}
     Wait until maubot is up
     # The token secret is kept, so a session survives the restart
     Set Suite Variable    ${token}    ${before_token}
@@ -200,10 +202,10 @@ Invalid homeservers are rejected
     Should Be Equal    ${config.homeservers}[0][name]    example.org
 
 Admin password can be changed
-    ${old} =    Set Variable    ${admin_password}
+    ${old} =    Set Variable    ${maubot_password}
     Configure current module    admin_password=ci-new-password-${SCENARIO}
     Read admin credentials
-    Should Be Equal    ${admin_password}    ci-new-password-${SCENARIO}
+    Should Be Equal    ${maubot_password}    ci-new-password-${SCENARIO}
     Wait until maubot is up
     ${body}    ${status} =    Login to maubot    ${old}
     Should Be Equal    ${status}    401
@@ -212,7 +214,7 @@ Check private files
     ${modes} =    Execute Command    runagent -m ${module_id} stat -c '%a' maubot.json config config/maubot.yaml
     Should Be Equal    ${modes}    600\n700\n600
     ${environment} =    Execute Command    runagent -m ${module_id} cat environment
-    Should Not Contain    ${environment}    ${admin_password}
+    Should Not Contain    ${environment}    ${maubot_password}
     Should Not Contain    ${environment}    PASSWORD
 
 Backup snapshot keeps maubot running
