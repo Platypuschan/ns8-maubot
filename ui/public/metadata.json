@@ -1,0 +1,21 @@
+{
+  "name": "maubot",
+  "description": {
+    "en": "Plugin-based Matrix bot system with a web management UI.",
+    "de": "Plugin-basiertes Matrix-Bot-System mit Web-Verwaltungsoberfläche."
+  },
+  "categories": [
+    "collaboration"
+  ],
+  "authors": [
+    {
+      "name": "Platypuschan"
+    }
+  ],
+  "docs": {
+    "documentation_url": "https://docs.mau.fi/maubot/",
+    "bug_url": "https://github.com/Platypuschan/ns8-maubot/issues",
+    "code_url": "https://github.com/Platypuschan/ns8-maubot"
+  },
+  "source": "ghcr.io/platypuschan/maubot"
+}

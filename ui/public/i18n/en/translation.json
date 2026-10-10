@@ -1,0 +1,85 @@
+{
+  "common": {
+    "required": "Required",
+    "work_in_progress": "Work in progress",
+    "processing": "Processing..."
+  },
+  "status": {
+    "title": "Status",
+    "app_instance": "App instance",
+    "services": "Service | Services",
+    "app_images": "App image | App images",
+    "app_volumes": "App volume | App volumes",
+    "installation_node": "Installation node",
+    "node": "Node",
+    "name": "Name",
+    "size": "Size",
+    "created": "Created",
+    "mount": "Mount",
+    "no_services": "No services",
+    "no_images": "No images",
+    "no_volumes": "No volumes"
+  },
+  "settings": {
+    "title": "Settings",
+    "configure_instance": "Configure {instance}",
+    "save": "Save",
+    "lets_encrypt": "Request LE Certificate",
+    "http_to_https": "Force HTTPS",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "configuring": "Configuring",
+    "instance_configuration": "Configure maubot",
+    "domain_already_used_in_traefik": "Domain already used in traefik",
+    "host_pattern": "Must be a valid fully qualified domain name",
+    "host_format": "Must be a valid fully qualified domain name",
+    "maubot_fqdn": "maubot hostname (FQDN)",
+    "management_title": "maubot management UI",
+    "management_description": "Upload plugins, add bot accounts (clients) and create plugin instances in the maubot management UI. Log in with the user and password below.",
+    "management_url": "Management UI",
+    "admin_user": "Username",
+    "admin_password": "Password",
+    "open_management": "Open management UI",
+    "homeservers_title": "Homeservers",
+    "homeservers_description": "Matrix homeservers whose bot accounts can be logged in from the management UI with a password. Bots on other homeservers can still be added with an access token. With the registration shared secret of a Synapse homeserver, new bot accounts can be registered from the UI.",
+    "homeserver_name": "Server name",
+    "homeserver_url": "Homeserver URL",
+    "homeserver_secret": "Registration shared secret (optional)",
+    "add_homeserver": "Add homeserver",
+    "remove_homeserver": "Remove",
+    "invalid_server_name": "Must be a Matrix server name, like example.org or example.org:8448",
+    "duplicate_server_name": "This server name is already in the list",
+    "invalid_homeserver_url": "Must be an http:// or https:// URL, like https://matrix.example.org",
+    "new_admin_password": "New admin password",
+    "new_admin_password_helper": "Leave empty to keep the current password.",
+    "admin_password_maxLength": "Must be at most 256 characters long"
+  },
+  "about": {
+    "title": "About"
+  },
+  "task": {
+    "cannot_create_task": "Cannot create task {action}"
+  },
+  "action": {
+    "get-status": "Get status",
+    "get-configuration": "Get configuration",
+    "configure-module": "Configure module",
+    "get-module-info": "Get module info",
+    "get-name": "Get name",
+    "list-backup-repositories": "List backup repositories",
+    "list-backups": "List backups",
+    "list-installed-modules": "List installed modules"
+  },
+  "error": {
+    "error": "Error",
+    "generic_error": "Something went wrong",
+    "validation_error": "Validation error",
+    "network_error": "Network error",
+    "network_timeout": "Network timeout",
+    "401": "Invalid authentication",
+    "403": "Operation not authorized",
+    "404": "Resource not found",
+    "cannot_retrieve_module_info": "Cannot retrieve module info",
+    "cannot_retrieve_installed_modules": "Cannot retrieve installed modules"
+  }
+}
