@@ -183,3 +183,11 @@ in every change that alters the module image (`imageroot`, `ui`, `runtime`,
 maubot is developed by Tulir Asokan and contributors under the AGPL-3.0.
 The module logo is the maubot icon from the maubot repository
 (`maubot/management/frontend/public/favicon.png`).
+
+## Minimum NS8 core version
+
+This module requires NS8 core **3.23.0** or newer. This conservative minimum
+matches the core version recorded by the existing successful QEMU installation
+[tests](https://github.com/Platypuschan/ns8-maubot/actions/runs/38081654839);
+compatibility with older cores has not been verified. The module image
+declares this requirement in `org.nethserver.min-core`.

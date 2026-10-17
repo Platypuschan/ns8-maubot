@@ -1,7 +1,7 @@
 {
   "name": "maubot",
   "description": {
-    "en": "Plugin-based Matrix bot system with a web management UI.",
+    "en": "Run plugin-based Matrix bots and manage bot accounts, plugins, and instances through a web interface.",
     "de": "Plugin-basiertes Matrix-Bot-System mit Web-Verwaltungsoberfläche."
   },
   "categories": [
