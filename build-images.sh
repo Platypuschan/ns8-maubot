@@ -55,6 +55,7 @@ buildah config --entrypoint=/ \
 	--label="org.nethserver.authorizations=traefik@node:routeadm" \
 	--label="org.nethserver.tcp-ports-demand=1" \
 	--label="org.nethserver.rootfull=0" \
+	--label="org.nethserver.min-core=3.23.0" \
 	--label="org.nethserver.images=${maubot_image}" \
 	"${container}"
 # Commit the image
