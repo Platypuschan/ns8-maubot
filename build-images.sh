@@ -27,7 +27,7 @@ if [[ -z "${CI:-}" ]] && ! buildah inspect --type image "${maubot_image}" >/dev/
 	buildah bud --layers -t "${maubot_image}" runtime
 fi
 # Keep in sync with the Node.js version used by .github/workflows/validate.yml
-NODE_IMAGE="docker.io/library/node:24.20.0"
+NODE_IMAGE="docker.io/library/node:24.22.2"
 nodebuilder="nodebuilder-maubot-${NODE_IMAGE##*:}"
 # Create a new empty container image
 container=$(buildah from scratch)
