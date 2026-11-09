@@ -188,7 +188,10 @@
       "matchManagers": [
         "github-actions"
       ],
-      "groupName": "GitHub Actions"
+      "groupName": "GitHub Actions",
+      "excludeDepNames": [
+        "node"
+      ]
     },
     {
       "description": "Runner images are not updated automatically across majors",
