@@ -189,8 +189,8 @@
         "github-actions"
       ],
       "groupName": "GitHub Actions",
-      "excludeDepNames": [
-        "node"
+      "matchDepNames": [
+        "!node"
       ]
     },
     {
