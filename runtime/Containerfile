@@ -47,6 +47,6 @@ RUN set -eux; \
         "requests>=2.33.0,<3" \
         "pytest>=9.0.3,<10"; \
     pip3 install --no-cache-dir --break-system-packages --no-deps \
-        "pillow-heif==1.8.1"; \
+        "pillow-heif==1.8.0"; \
     python3 -c "import maubot, mautrix, aiohttp, PIL, olm, ssl; print(ssl.OPENSSL_VERSION)"; \
     python3 -c "import matplotlib, numpy, bs4, emoji, apscheduler, cron_descriptor, pillow_heif; pillow_heif.register_heif_opener(); print('plugin libraries ok')"
