@@ -114,7 +114,8 @@
           ],
           "bumpType": "patch"
         }
-      ]
+      ],
+      "commitMessageSuffix": "(auto-merge test)"
     },
     {
       "matchDepNames": [
