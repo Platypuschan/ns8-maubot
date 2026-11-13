@@ -9,12 +9,14 @@ set -Eeuo pipefail
 
 cd "$(dirname "$0")"
 IMAGE_URL="${2:?missing module image URL}"
+# A digest contains a colon too: remove @sha256:... before removing a tag.
+IMAGE_REPOSITORY="${IMAGE_URL%%@*}"
 status=0
-PREVIOUS_IMAGE_URL="$(python3 .github/scripts/previous-release "${IMAGE_URL%:*}")" || status=$?
+PREVIOUS_IMAGE_URL="$(python3 .github/scripts/previous-release "${IMAGE_REPOSITORY%:*}")" || status=$?
 if [[ "${status}" -eq 3 ]]; then
     # Before the first release there is nothing to update from. Any other
     # lookup failure (registry, network) still fails the scenario.
-    echo "::notice::No published release of ${IMAGE_URL%:*} yet; the update scenario is skipped."
+    echo "::notice::No published release of ${IMAGE_REPOSITORY%:*} yet; the update scenario is skipped."
     exit 0
 elif [[ "${status}" -ne 0 ]]; then
     exit "${status}"
