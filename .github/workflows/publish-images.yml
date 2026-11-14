@@ -14,7 +14,11 @@ concurrency:
   group: publish-suite-${{ github.ref }}
   cancel-in-progress: true
 
+# Shared contract: see .github/CI-RELEASE-CONTRACT.md.
+# Module-only prerequisites are deliberately bounded below, not mixed into
+# digest resolution, QEMU, scanners or tested-image attestation.
 jobs:
+  # BEGIN MODULE PREREQUISITES
   runtime:
     name: "maubot runtime image"
     runs-on: ubuntu-24.04
@@ -44,6 +48,8 @@ jobs:
           printf '%s' "$REGISTRY_TOKEN" | buildah login --username "$GITHUB_ACTOR" --password-stdin ghcr.io
           buildah push "${image}" "docker://${image}"
           echo "Published ${image}" >> "$GITHUB_STEP_SUMMARY"
+
+  # END MODULE PREREQUISITES
 
   # A pushed tag whose image already exists, such as the release tag that
   # publish-catalog-version creates, must not rebuild and replace the tested
@@ -81,9 +87,12 @@ jobs:
             exit 1
           fi
 
+  # BEGIN MODULE CONFIG
+  # Wire the module prerequisites above; retain any first-run guard.
   publish-images:
     needs: [runtime, existing-tag]
     if: ${{ needs.existing-tag.outputs.build == 'true' }}
+  # END MODULE CONFIG
     uses: NethServer/ns8-github-actions/.github/workflows/publish-branch.yml@e35baed847065163e5fcb2fe396c968aa413827b # v1
 
   module:
